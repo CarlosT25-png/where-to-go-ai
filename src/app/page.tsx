@@ -1,52 +1,38 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/RdoConCUXG8
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export default function Component() {
   return (
     <div className="flex flex-col min-h-[100dvh]">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
+      <header className="px-4 lg:px-6 py-2 flex items-center">
         <Link
           href="#"
           className="flex items-center justify-center"
           prefetch={false}
         >
           {/* <PlaneIcon className="h-6 w-6" /> */}
+          <Image
+            src="/assets/img/wheretogo.png"
+            alt="Where To GO AI Logo"
+            width={100}
+            height={100}
+            className="mx-auto rounded-lg"
+          />
           <span className="sr-only">WhereToGO AI</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
           <Link
-            href="#"
+            href="/login"
             className="text-sm font-medium hover:underline underline-offset-4"
             prefetch={false}
           >
-            Features
+            Login
           </Link>
-          <Link
-            href="#"
-            className="text-sm font-medium hover:underline underline-offset-4"
-            prefetch={false}
-          >
-            How It Works
-          </Link>
-          <Link
-            href="#"
-            className="text-sm font-medium hover:underline underline-offset-4"
-            prefetch={false}
-          >
-            Pricing
-          </Link>
-          <Link
-            href="#"
-            className="text-sm font-medium hover:underline underline-offset-4"
-            prefetch={false}
-          >
-            About
+          <Link href={'/signup'}>
+            <Button>Sign Up</Button>
           </Link>
         </nav>
       </header>
@@ -231,7 +217,9 @@ export default function Component() {
                 </div>
                 <div className="prose text-muted-foreground mt-4">
                   <p>
-                    {'"As a busy professional, I don\'t have a lot of time to\nplan trips. WhereToGO AI saved me so much time and\n stress.The app\'s recommendations were spot on, and I had\n an amazing vacation."'}
+                    {
+                      "\"As a busy professional, I don't have a lot of time to\nplan trips. WhereToGO AI saved me so much time and\n stress.The app's recommendations were spot on, and I had\n an amazing vacation.\""
+                    }
                   </p>
                 </div>
               </Card>

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import axios from "axios";
 
 export type SignUpObject = {
+  name: string
   email: string
   password: string
   token: string
@@ -12,18 +13,17 @@ export type SignUpObject = {
 
 export const login = async (formData: FormData) => {
   const supabase = createClient()
-  console.log(formData.get('email'))
   const { error } = await supabase.auth.signInWithPassword({
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   })
 
   if(error){
-    redirect("/login?message=The Credentials are Invalid")
+    redirect("/login?message="+error.message)
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/app')
 }
 
 export const signup = async (data: SignUpObject) => {
@@ -31,12 +31,17 @@ export const signup = async (data: SignUpObject) => {
   const { error } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
+    options: {
+      data: {
+        name: data.name
+      }
+    }
   })
 
   const captchaStatus = await validateCaptchaToken(data.token)
 
   if(error){
-    redirect("/signup?message=Error - Check the fields")
+    redirect("/signup?message="+error.message)
   }
 
   if(captchaStatus.status === 'error'){
@@ -44,7 +49,7 @@ export const signup = async (data: SignUpObject) => {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/?toastmessage=Account Created-Please verify your Email Account')
+  redirect('/signup/pending-email-verification')
 }
 
 const validateCaptchaToken = async (gRecaptchaToken: string) => {

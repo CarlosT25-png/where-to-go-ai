@@ -1,36 +1,45 @@
-"use client"
+"use client";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { signup } from "./actions";
 import { FormEvent } from "react";
+import { useUserData } from "@/store/useUserData";
 
-
-
-export default function SignUpForm({ searchParams }: { searchParams: { message: string }}) {
-  const { executeRecaptcha } = useGoogleReCaptcha()
+export default function SignUpForm({
+  searchParams,
+}: {
+  searchParams: { message: string };
+}) {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  const { setNewUser } = useUserData();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if(!executeRecaptcha){
-      alert('Not available to execute reCaptcha')
-      return
+    if (!executeRecaptcha) {
+      alert("Not available to execute reCaptcha");
+      return;
     }
-    console.log('EXECUTING')
+    console.log("EXECUTING");
 
     const form = e.target as HTMLFormElement;
 
-    const gRecaptchaToken = await executeRecaptcha('inquirySubmit')
+    const gRecaptchaToken = await executeRecaptcha("inquirySubmit");
+    setNewUser({
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+    });
     signup({
-      email: (form.elements.namedItem('email') as HTMLInputElement).value,
-      password: (form.elements.namedItem('password') as HTMLInputElement).value,
-      token: gRecaptchaToken
-    })
-  }
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      password: (form.elements.namedItem("password") as HTMLInputElement).value,
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      token: gRecaptchaToken,
+    });
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -52,6 +61,17 @@ export default function SignUpForm({ searchParams }: { searchParams: { message: 
         </div>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
+            <Label htmlFor="email">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              type="name"
+              placeholder="Enter your name"
+              required
+              min={3}
+            />
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -69,10 +89,13 @@ export default function SignUpForm({ searchParams }: { searchParams: { message: 
               type="password"
               placeholder="Enter your password"
               required
+              min={8}
             />
           </div>
-          {searchParams?.message && <div className="py-1 text-red-600">{searchParams.message}</div>}
-          <Button type="submit" className="w-full" >
+          {searchParams?.message && (
+            <div className="py-1 text-red-600">{searchParams.message}</div>
+          )}
+          <Button type="submit" className="w-full">
             Sign Up
           </Button>
         </form>

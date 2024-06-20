@@ -28,10 +28,8 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <GoogleCaptchaWrapper>
-          {children}
-          <Toaster />
-        </GoogleCaptchaWrapper>
+        {children}
+        <Toaster />
       </body>
     </html>
   );

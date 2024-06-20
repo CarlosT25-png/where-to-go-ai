@@ -1,8 +1,11 @@
 import SignUpForm from "@/components/Auth/SignUpForm";
+import GoogleCaptchaWrapper from "../GoogleCaptchaProvider";
 
 const page = ({ searchParams }: { searchParams: { message: string }}) => {
   return (
-    <SignUpForm searchParams={searchParams} />
+    <GoogleCaptchaWrapper>
+      <SignUpForm searchParams={searchParams} />
+    </GoogleCaptchaWrapper>
   );
 }
 
