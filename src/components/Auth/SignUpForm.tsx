@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { signup } from "./actions";
 import { FormEvent } from "react";
 import { useUserData } from "@/store/useUserData";
+import { FiChevronLeft } from "react-icons/fi";
 
 export default function SignUpForm({
   searchParams,
@@ -44,6 +45,13 @@ export default function SignUpForm({
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="w-full max-w-md p-6 space-y-6 bg-card rounded-xl shadow-lg">
+        <Link
+          href={"/"}
+          aria-label="Go back button"
+          className="flex items-center gap-1"
+        >
+          <FiChevronLeft size={"1.2rem"} /> Go back
+        </Link>
         <div className="space-y-2 text-center">
           <div className="flex justify-center">
             <Image

@@ -5,6 +5,10 @@ import { IoMdCloseCircleOutline } from "react-icons/io";
 import { useChat } from "ai/react";
 import { useToast } from "@/components/ui/use-toast";
 import Chat from "./Chat";
+import { User } from "@supabase/supabase-js";
+import { useUserData } from "@/store/useUserData";
+import { Button } from "../ui/button";
+import { FiSend } from "react-icons/fi";
 
 type Tab = {
   id: number;
@@ -12,18 +16,32 @@ type Tab = {
   active: boolean;
 };
 
-export default function ConversationDashboard({ searchParams }: { searchParams: { toastmessage: string }}) {
+export default function ConversationDashboard({
+  searchParams,
+  user,
+}: {
+  searchParams: { toastmessage: string };
+  user: User;
+}) {
   // Toast
-  const { toast } = useToast()
+  const { toast } = useToast();
+
+  // setNewUser local state
+  const { setNewUser } = useUserData();
 
   useEffect(() => {
-    if(searchParams.toastmessage){
+    if (searchParams.toastmessage) {
       toast({
-        title: searchParams.toastmessage.split('-')[0],
-        description: searchParams.toastmessage.split('-')[1],
-      })
+        title: searchParams.toastmessage.split("-")[0],
+        description: searchParams.toastmessage.split("-")[1],
+      });
     }
-  }, [searchParams, toast])
+
+    setNewUser({
+      email: user.email as string,
+      name: user.user_metadata["name"] as string,
+    });
+  }, [searchParams, toast, user]);
   // AI
   const { messages, input, handleInputChange, handleSubmit } = useChat();
 
@@ -68,7 +86,7 @@ export default function ConversationDashboard({ searchParams }: { searchParams: 
       }
       return newTabs;
     });
-  };  
+  };
   return (
     <div className="flex h-screen w-full">
       <div className="bg-gray-100 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 w-[280px] p-4">
@@ -87,7 +105,7 @@ export default function ConversationDashboard({ searchParams }: { searchParams: 
           ))}
         </div>
       </div>
-      <div className="flex-1 flex flex-col">
+      {/* <div className="flex-1 flex flex-col">
         <div className="border-b border-gray-200 dark:border-gray-800 flex">
           {tabs.map((tab) => (
             <button
@@ -111,26 +129,82 @@ export default function ConversationDashboard({ searchParams }: { searchParams: 
             </button>
           ))}
         </div>
-        {/* content  */}
         <div className="flex flex-col p-4 overflow-y-auto h-full">
-          <div className="space-y-4 overflow-y-auto flex-1">
+          <div className="space-y-4 overflow-y-auto flex-1 flex justify-center">
             <Chat messages={messages} />
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
-            <form className="flex items-center" onSubmit={handleSubmit}>
+          <div className="border-t border-gray-200 dark:border-gray-800 p-4 space-y-4 flex justify-center">
+            <form className="flex items-stretch" onSubmit={handleSubmit}>
               <textarea
-                className="flex-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-[40rem] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 placeholder="Type your message..."
                 value={input}
                 onChange={handleInputChange}
               />
-              <button
-                className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              <Button
+                className="ml-2 h-full"
                 type="submit"
+                aria-label="send prompt"
               >
-                Send
-              </button>
+                <FiSend size={'1.2rem'} />
+              </Button>
             </form>
+          </div>
+        </div>
+      </div> */}
+      <div className="flex flex-1 flex-col">
+        {/* tabs */}
+        <div className="border-b border-gray-200 dark:border-gray-800 flex">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
+                tab.active
+                  ? "bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 border-b-2 border-blue-500"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900"
+              }`}
+              onClick={() => handleTabClick(tab)}
+            >
+              {tab.title}
+              {tab.id !== 1 && (
+                <span>
+                  <IoMdCloseCircleOutline
+                    size={"1rem"}
+                    onClick={(e) => handleCloseTabClick(tab, e)}
+                  />
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        {/* chat */}
+        <div className="w-full h-full flex flex-col overflow-hidden">
+          <div className="w-full h-full overflow-y-auto flex items-center flex-col">
+            <div className="space-y-4 max-w-4xl w-full flex-1 flex justify-start">
+              <Chat messages={messages} />
+            </div>
+          </div>
+          <div className="w-full flex items-center flex-col">
+            <div className="border-t border-gray-200 dark:border-gray-800 py-4 space-y-4 flex justify-center max-w-4xl w-full">
+              <form
+                className="flex items-stretch justify-center w-full"
+                onSubmit={handleSubmit}
+              >
+                <textarea
+                  className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Type your message..."
+                  value={input}
+                  onChange={handleInputChange}
+                />
+                <Button
+                  className="ml-2 h-full"
+                  type="submit"
+                  aria-label="send prompt"
+                >
+                  <FiSend size={"1.2rem"} />
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

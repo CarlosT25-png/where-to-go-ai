@@ -8,8 +8,8 @@ export default async function Page({ searchParams }: { searchParams: { toastmess
   const { data, error } = await supabase.auth.getUser();
   if (!data.user) {
     redirect("/login");
-  }
+  } 
   return (
-    <ConversationDashboard searchParams={searchParams} />
+    <ConversationDashboard searchParams={searchParams} user={data.user} />
   );
 }

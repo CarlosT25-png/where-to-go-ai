@@ -6,12 +6,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
 import { login } from "./actions";
+import { FiChevronLeft } from "react-icons/fi";
 
-export default async function LoginForm({ searchParams }: { searchParams: { message: string }}) {
-
+export default async function LoginForm({
+  searchParams,
+}: {
+  searchParams: { message: string };
+}) {
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
+        <Link
+          href={"/"}
+          aria-label="Go back button"
+          className="flex items-center gap-1"
+        >
+          <FiChevronLeft size={'1.2rem'} /> Go back
+        </Link>
         <div>
           <Image
             src="/assets/img/wheretogo.png"
@@ -34,7 +45,12 @@ export default async function LoginForm({ searchParams }: { searchParams: { mess
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" action={login} method="POST" encType="multipart/form-data">
+        <form
+          className="mt-8 space-y-6"
+          action={login}
+          method="POST"
+          encType="multipart/form-data"
+        >
           <div className="flex flex-col gap-3 rounded-md shadow-sm">
             <div>
               <Label htmlFor="email" className="sr-only">
@@ -65,7 +81,9 @@ export default async function LoginForm({ searchParams }: { searchParams: { mess
               />
             </div>
           </div>
-          {searchParams?.message && <div className="py-1 text-red-600">{searchParams.message}</div>}
+          {searchParams?.message && (
+            <div className="py-1 text-red-600">{searchParams.message}</div>
+          )}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Checkbox
