@@ -62,19 +62,6 @@ export default function ConversationDashboard({
     setTabs(tabs.map((t) => ({ ...t, active: t.id === tab.id })));
     setCurrentTab(tab);
   };
-  // const handleSendMessage = () => {
-  //   if (message.trim() !== "") {
-  //     setHistory([
-  //       ...history,
-  //       {
-  //         id: history.length + 1,
-  //         title: message,
-  //         date: new Date().toISOString().slice(0, 10),
-  //       },
-  //     ]);
-  //     setMessage("");
-  //   }
-  // };
   const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (input.trim() !== "") {
