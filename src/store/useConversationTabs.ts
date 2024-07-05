@@ -19,9 +19,14 @@ type initialState = {
 export const useConversationTabs = create<initialState>((set) => ({
   tabs: [{ id: "1", title: "Where To Go AI", active: true, messages: [] }],
   addNewTab: async (newTab: Tab) => {
-    set(state => ({
-      tabs: [...state.tabs, newTab]
-    }))
+
+
+    set((state: initialState) => {
+      const newTabs = state.tabs;
+      newTabs.forEach((el) => el.active = false)
+      newTabs.push(newTab)
+      return {tabs: newTabs};
+    });
 
     console.log(addConversationHistory(newTab.messages))
   },
@@ -35,8 +40,12 @@ export const useConversationTabs = create<initialState>((set) => ({
   closeTab: (tabId: string) => {
     set(state => {
       // Handle case where there's only one tab
+      const newTabs = state.tabs.filter((currentTab) => tabId !== currentTab.id)
+      if(newTabs.length === 1){
+        newTabs[0].active = true
+      }
       return {
-        tabs: state.tabs.filter((currentTab) => tabId !== currentTab.id)
+        tabs: newTabs
       }
     })
   }
