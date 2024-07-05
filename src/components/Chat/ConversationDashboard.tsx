@@ -10,6 +10,7 @@ import { useUserData } from "@/store/useUserData";
 import { Button } from "../ui/button";
 import { FiSend } from "react-icons/fi";
 import { v4 as uuidv4 } from 'uuid';
+import { useConversationTabs } from "@/store/useConversationTabs";
 
 type Tab = {
   id: string;
@@ -26,6 +27,8 @@ export default function ConversationDashboard({
 }) {
   // Toast
   const { toast } = useToast();
+
+  const { addNewTab, closeTab, setTabActive, tabs } = useConversationTabs(state => state)
 
   // setNewUser local state
   const { setNewUser } = useUserData();
@@ -46,34 +49,35 @@ export default function ConversationDashboard({
   // AI
   const { messages, input, handleInputChange, handleSubmit } = useChat();
 
-  const [tabs, setTabs] = useState<Tab[]>([
-    { id: '1', title: "Where To Go AI", active: true },
-    { id: '2', title: "Places to Visit NYC", active: false },
-    { id: '3', title: "Places to eat in NYC", active: false },
-  ]);
   const [history, setHistory] = useState([
     { id: '1', title: "Conversation 1", date: "2023-05-01" },
     { id: '2', title: "Conversation 2", date: "2023-04-15" },
     { id: '3', title: "Conversation 3", date: "2023-03-20" },
   ]);
-  const [currentTab, setCurrentTab] = useState(tabs[0]);
+  // const [currentTab, setCurrentTab] = useState(tabs[0]);
   const [message, setMessage] = useState("");
   const handleTabClick = (tab: Tab) => {
-    setTabs(tabs.map((t) => ({ ...t, active: t.id === tab.id })));
-    setCurrentTab(tab);
+    // setTabs(tabs.map((t) => ({ ...t, active: t.id === tab.id })));
+    setTabActive(tab.id)
+    // setCurrentTab(tab);
   };
   const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (input.trim() !== "") {
-      console.log('first')
-      setTabs(((prevTabs) => {
-        prevTabs[0].active = false
-        return [...prevTabs, {
-          id: uuidv4(),
-          active: true,
-          title: 'new Tab'
-        }]
-      }))
+      // setTabs(((prevTabs) => {
+      //   prevTabs[0].active = false
+      //   return [...prevTabs, {
+      //     id: uuidv4(),
+      //     active: true,
+      //     title: 'new Tab'
+      //   }]
+      // }))
+      addNewTab({
+        id: uuidv4(),
+        active: true,
+        title: 'new tab',
+        messages: messages
+      })
       handleSubmit(e)
     }
   };
@@ -82,13 +86,14 @@ export default function ConversationDashboard({
     e: React.MouseEvent<SVGElement, MouseEvent>
   ) => {
     e.stopPropagation();
-    setTabs((tabs) => {
-      const newTabs = tabs.filter((currentTab) => tab.id !== currentTab.id);
-      if (newTabs.length === 1) {
-        setCurrentTab(tabs[0]);
-      }
-      return newTabs;
-    });
+    // setTabs((tabs) => {
+    //   const newTabs = tabs.filter((currentTab) => tab.id !== currentTab.id);
+    //   if (newTabs.length === 1) {
+    //     setCurrentTab(tabs[0]);
+    //   }
+    //   return newTabs;
+    // });
+    closeTab(tab.id)
   };
   return (
     <div className="flex h-screen w-full">

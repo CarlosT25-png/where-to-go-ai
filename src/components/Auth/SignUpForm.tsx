@@ -25,7 +25,6 @@ export default function SignUpForm({
       alert("Not available to execute reCaptcha");
       return;
     }
-    console.log("EXECUTING");
 
     const form = e.target as HTMLFormElement;
 
