@@ -2,20 +2,26 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { IoMdCloseCircleOutline } from "react-icons/io";
-import { useChat } from "ai/react";
+import { useChat, useCompletion } from "ai/react";
 import { useToast } from "@/components/ui/use-toast";
 import Chat from "./Chat";
 import { User } from "@supabase/supabase-js";
 import { useUserData } from "@/store/useUserData";
 import { Button } from "../ui/button";
 import { FiSend } from "react-icons/fi";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { useConversationTabs } from "@/store/useConversationTabs";
+import { debouncedUpdateConversationMessage } from "@/utils/fn/debounce";
 
 type Tab = {
   id: string;
   title: string;
   active: boolean;
+};
+
+const getActiveTab = (tabs: Tab[]) => {
+  const tabId = tabs.find((val) => val.active === true)?.id;
+  return tabId;
 };
 
 export default function ConversationDashboard({
@@ -28,7 +34,9 @@ export default function ConversationDashboard({
   // Toast
   const { toast } = useToast();
 
-  const { addNewTab, closeTab, setTabActive, tabs } = useConversationTabs(state => state)
+  const { addNewTab, closeTab, setTabActive, tabs } = useConversationTabs(
+    (state) => state
+  );
 
   // setNewUser local state
   const { setNewUser } = useUserData();
@@ -47,22 +55,46 @@ export default function ConversationDashboard({
     });
   }, [searchParams, toast, user]);
   // AI
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    // onFinish: async () => {
+    //   const tabId = getActiveTab(tabs)
+    //   console.log(tabId)
+    //   if(tabId){
+    //     console.log(messages)
+    //     await updateConversationMessage(tabId, [...messages])
+    //   }
+    // }
+  });
+
+  // Ensure that the 'messages' array is updated correctly
+  useEffect(() => {
+    // save new messages
+    const saveMessagesDB = async () => {
+      const tabId = getActiveTab(tabs);
+      if (tabId) {
+        debouncedUpdateConversationMessage(tabId, [...messages]);
+      }
+    };
+    
+    if(messages.length >= 2){
+      saveMessagesDB();
+    }
+  }, [messages]);
 
   const [history, setHistory] = useState([
-    { id: '1', title: "Conversation 1", date: "2023-05-01" },
-    { id: '2', title: "Conversation 2", date: "2023-04-15" },
-    { id: '3', title: "Conversation 3", date: "2023-03-20" },
+    { id: "1", title: "Conversation 1", date: "2023-05-01" },
+    { id: "2", title: "Conversation 2", date: "2023-04-15" },
+    { id: "3", title: "Conversation 3", date: "2023-03-20" },
   ]);
   // const [currentTab, setCurrentTab] = useState(tabs[0]);
   const [message, setMessage] = useState("");
   const handleTabClick = (tab: Tab) => {
     // setTabs(tabs.map((t) => ({ ...t, active: t.id === tab.id })));
-    setTabActive(tab.id)
+    setTabActive(tab.id);
     // setCurrentTab(tab);
   };
   const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     if (input.trim() !== "") {
       // setTabs(((prevTabs) => {
       //   prevTabs[0].active = false
@@ -75,10 +107,10 @@ export default function ConversationDashboard({
       addNewTab({
         id: uuidv4(),
         active: true,
-        title: 'new tab',
-        messages: messages
-      })
-      handleSubmit(e)
+        title: "new tab",
+        messages: messages,
+      });
+      handleSubmit(e);
     }
   };
   const handleCloseTabClick = (
@@ -93,7 +125,7 @@ export default function ConversationDashboard({
     //   }
     //   return newTabs;
     // });
-    closeTab(tab.id)
+    closeTab(tab.id);
   };
   return (
     <div className="flex h-screen w-full">
@@ -127,7 +159,7 @@ export default function ConversationDashboard({
               onClick={() => handleTabClick(tab)}
             >
               {tab.title}
-              {tab.id !== '1' && (
+              {tab.id !== "1" && (
                 <span>
                   <IoMdCloseCircleOutline
                     size={"1rem"}

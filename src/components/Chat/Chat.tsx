@@ -15,7 +15,6 @@ type ChatProps = {
 const Chat = ({ messages }: ChatProps) => {
   const editorRef = useRef<TinyMCEEditor | null>(null);
   const converter = new showdown.Converter();
-  console.log(messages)
 
   const convertMarkdownToHtml = (markdown: string) => {
     const html = converter.makeHtml(markdown);

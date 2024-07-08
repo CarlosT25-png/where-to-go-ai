@@ -19,18 +19,19 @@ type initialState = {
 export const useConversationTabs = create<initialState>((set) => ({
   tabs: [{ id: "1", title: "Where To Go AI", active: true, messages: [] }],
   addNewTab: async (newTab: Tab) => {
-
-
+    // save to DB
+    const id = await addConversationHistory(newTab.messages) 
+    // Only save if it is not saved in the DB - Pending
     set((state: initialState) => {
       const newTabs = state.tabs;
       newTabs.forEach((el) => el.active = false)
-      newTabs.push(newTab)
+      const newTabWithDBId = newTab
+      newTabWithDBId.id = id
+      newTabs.push(newTabWithDBId)
       return {tabs: newTabs};
     });
-
-    console.log(addConversationHistory(newTab.messages))
   },
-  setTabActive: (tabId: string) => {
+  setTabActive: (tabId: string) => { // fix delete state active from other tabs
     set(state => {
       return {
         tabs: state.tabs.map((t) => ({ ...t, active: t.id === tabId}))
